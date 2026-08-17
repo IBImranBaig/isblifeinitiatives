@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc \"C:\\\\Users\\\\Chetan\\\\Downloads\\\\imranbaig.com - 27 May.docx\" -t markdown)",
+      "Read(//c/Python313/**)",
+      "Read(//c/Users/Chetan/AppData/Local/Programs/**)",
+      "Bash(/c/Python314/python.exe -c ' *)",
+      "PowerShell($p = \"C:\\\\Users\\\\Chetan\\\\Downloads\\\\imranbaig.com - 27 May.docx\"; Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\($p\\); $entry = $zip.Entries | Where-Object { $_.FullName -eq \"word/document.xml\" }; $reader = New-Object System.IO.StreamReader\\($entry.Open\\(\\)\\); $xml = $reader.ReadToEnd\\(\\); $reader.Close\\(\\); $zip.Dispose\\(\\); $xml | Out-File -FilePath \"$env:TEMP\\\\imran_doc.xml\" -Encoding utf8; \\(Get-Item \"$env:TEMP\\\\imran_doc.xml\"\\).Length)"
+    ]
+  }
+}

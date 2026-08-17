@@ -1,0 +1,9 @@
+# Raw source material used only at build time to generate the processed assets
+# in public/mosaics, public/programs, public/media, etc. Not served at runtime —
+# excluded from the deploy to keep it lean and avoid exposing the originals.
+public/Program Videos
+public/TPA Certificates
+public/IP Certificates
+public/Media Coverage
+
+# (re-trigger deploy)

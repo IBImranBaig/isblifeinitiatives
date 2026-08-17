@@ -1,0 +1,352 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS — "The Mind Decoder"
+   90% darkness · 8% paper · 2% glow. Color is a scalpel.
+   ============================================================ */
+@theme {
+  /* Core palette — deep navy void, sapphire luxury */
+  --color-ink: #05080f; /* deep navy-black */
+  --color-ink-2: #0a1020;
+  --color-graphite: #121a2e;
+  --color-paper: #eef2fa; /* cool platinum white */
+  --color-paper-dim: #97a3bd;
+
+  /* Primary accent — luminous royal azure (atmosphere, ink, light) */
+  --color-ember: #5b86e8;
+  --color-ember-soft: #a9c2ff;
+  --color-ember-deep: #2a4ea0;
+
+  /* Luminous accent — brighter sky-blue, for "data"/science moments */
+  --color-glow: #62c0ff;
+  --color-glow-deep: #2f7fc0;
+  --color-glow-soft: #b8e2ff;
+
+  /* Surfaces & hairlines — for cards, pills, dividers on the dark void */
+  --color-surface: #0e1626; /* raised panel on ink */
+  --color-surface-2: #14203a;
+  --color-line: #1f2c44; /* hairline border */
+
+  /* Typography families — wired to next/font CSS variables (see layout.tsx) */
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* ---- Type scale (display) — fluid clamps, paired line-heights ---- *
+   * Generates utilities: text-display-sm … text-display-xl           */
+  --text-display-sm: clamp(1.75rem, 3vw, 2.5rem);
+  --text-display-sm--line-height: 1.05;
+  --text-display-md: clamp(2.25rem, 5vw, 3.75rem);
+  --text-display-md--line-height: 1;
+  --text-display-lg: clamp(2.5rem, 6.5vw, 5rem);
+  --text-display-lg--line-height: 0.95;
+  --text-display-xl: clamp(3rem, 11vw, 9.5rem);
+  --text-display-xl--line-height: 0.9;
+  /* Body lead */
+  --text-lead: clamp(1rem, 1.4vw, 1.125rem);
+  --text-lead--line-height: 1.6;
+
+  /* ---- Radius scale ---- */
+  --radius-card: 1.25rem;
+  --radius-pill: 9999px;
+
+  /* ---- Spacing rhythm (semantic; tightened for less vertical scroll) ---- */
+  --spacing-gutter: 1.5rem;
+  --spacing-section: 2.25rem;
+  --spacing-section-lg: 3.75rem;
+
+  /* Brand easing — "settle, never bounce" */
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-ink: cubic-bezier(0.65, 0.05, 0.36, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Clip horizontal bleed from decorative/ambient layers at the scroll root.
+       `clip` (not `hidden`) contains the overflow without creating a scroll
+       container, so it never breaks the pinned/sticky scroll sections. */
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-glow) 35%, transparent);
+    color: #fff;
+  }
+
+  /* Premium focus ring for keyboard users only */
+  :focus-visible {
+    outline: 2px solid var(--color-glow);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+@layer utilities {
+  /* Faint film grain to keep dark surfaces from feeling sterile */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+}
+
+/* Ambient MRI scan-line sweep (Neuroscience section). Disabled under
+   prefers-reduced-motion by the rule below. */
+@keyframes ns-scan-sweep {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(190px);
+    opacity: 0;
+  }
+}
+.ns-scan {
+  animation: ns-scan-sweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Audio waveform "playing" pulse (Podcast section). Applied on hover; the
+   reduced-motion rule below neutralises it. */
+@keyframes wave-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* Press logo marquee — seamless horizontal loop ("As featured in").
+   Two identical logo sets sit side by side; shifting the track by -50%
+   lands exactly on the start of the second set. Neutralised by the
+   reduced-motion rule below. */
+@keyframes press-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.press-marquee {
+  /* Duration is overridable per-instance via --press-marquee-duration. */
+  animation: press-marquee var(--press-marquee-duration, 32s) linear infinite;
+  will-change: transform;
+}
+/* Pause the loop while hovering its `group` wrapper (reliable — a utility class
+   can't override the shorthand above, but this plain rule can). */
+.group:hover .press-marquee {
+  animation-play-state: paused;
+}
+.press-marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* Certificate proof-wall mosaic — columns drift vertically in a seamless loop.
+   Each column holds two identical image sets; shifting by -50% lands on the
+   start of the second set. Neutralised by the reduced-motion rule below. */
+@keyframes mosaic-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes mosaic-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.mosaic-col-up {
+  animation: mosaic-up linear infinite;
+  will-change: transform;
+}
+.mosaic-col-down {
+  animation: mosaic-down linear infinite;
+  will-change: transform;
+}
+/* Horizontal variants — for the row-based program backdrop (e.g. Program 1). */
+@keyframes mosaic-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes mosaic-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.mosaic-row-left {
+  animation: mosaic-left linear infinite;
+  will-change: transform;
+}
+.mosaic-row-right {
+  animation: mosaic-right linear infinite;
+  will-change: transform;
+}
+
+/* ── Ambient background (site-wide premium canvas) ───────────────────── */
+.ambient-aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(48px);
+  will-change: transform;
+}
+.ambient-aurora--a {
+  left: -15vw;
+  top: -12vh;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(closest-side, rgba(91, 134, 232, 0.2), transparent 72%);
+  animation: ambient-a 42s ease-in-out infinite alternate;
+}
+.ambient-aurora--b {
+  right: -20vw;
+  top: 22vh;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(closest-side, rgba(98, 192, 255, 0.13), transparent 72%);
+  animation: ambient-b 56s ease-in-out infinite alternate;
+}
+.ambient-aurora--c {
+  left: 18vw;
+  bottom: -28vh;
+  width: 62vw;
+  height: 62vw;
+  background: radial-gradient(closest-side, rgba(42, 78, 160, 0.22), transparent 72%);
+  animation: ambient-c 68s ease-in-out infinite alternate;
+}
+@keyframes ambient-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(8vw, 6vh, 0) scale(1.18); }
+}
+@keyframes ambient-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-7vw, 8vh, 0) scale(1); }
+}
+@keyframes ambient-c {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(6vw, -7vh, 0) scale(1.2); }
+}
+.ambient-script {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150vw;
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.06;
+}
+.ambient-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── /tfs/offer — gold offer page (CTA glow + price reveal) ──────────── */
+@keyframes tfs-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(242, 217, 141, 0.45), 0 18px 50px -10px rgba(201, 168, 76, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(242, 217, 141, 0), 0 24px 60px -10px rgba(201, 168, 76, 0.85);
+  }
+}
+.tfs-pulse-glow {
+  animation: tfs-pulse-glow 2.4s ease-in-out infinite;
+}
+@keyframes tfs-price-rise {
+  0% { opacity: 0; transform: translateY(18px) scale(0.9); filter: blur(8px); }
+  55% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.tfs-price-reveal {
+  animation: tfs-price-rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes tfs-pen-in {
+  0% { opacity: 0; transform: translate(16px, -16px); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
+.tfs-pen-in {
+  animation: tfs-pen-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+/* ── /ebook — workbook cover: divine glow + float ───────────────────── */
+@keyframes ebook-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.ebook-float {
+  animation: ebook-float 5.5s ease-in-out infinite;
+}
+@keyframes ebook-halo {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+.ebook-halo {
+  animation: ebook-halo 4.5s ease-in-out infinite;
+}
+@keyframes ebook-pop-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ebook-pop-in {
+  animation: ebook-pop-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Respect users who prefer reduced motion at the platform level */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
